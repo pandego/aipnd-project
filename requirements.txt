@@ -1,0 +1,11 @@
+# python 3.10.0 // macosx
+
+# pip install torch torchvision torchaudio
+torch==2.1.0
+torchvision==0.16.0
+torchaudio==2.1.0
+
+Pillow==10.10
+loguru==0.7.2
+ipykernel==6.25.2
+matplotlib==3.8.0
