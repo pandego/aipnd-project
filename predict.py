@@ -7,12 +7,10 @@ import torch
 from PIL import Image
 from torchvision import models
 
-with open('cat_to_name.json', 'r') as f:
-    cat_to_name = json.load(f)
-
 
 def load_checkpoint(filepath):
     checkpoint = torch.load(filepath)
+
     arch = checkpoint['arch']
 
     if arch == "vgg16":
@@ -39,7 +37,10 @@ def load_checkpoint(filepath):
     model.load_state_dict(checkpoint['state_dict'])
     model.class_to_idx = checkpoint['class_to_idx']
 
-    return model
+    # optimizer = None
+    # epochs = checkpoint.get('epochs', 0)
+
+    return model  # , optimizer, epochs
 
 
 def process_image(image_path):
@@ -104,12 +105,12 @@ def imshow(image, ax=None, title=None):
     return ax
 
 
-def predict(image_path, model, topk=5):
+def predict(image_path, model, use_gpu, topk=5):
     ''' Predict the class (or classes) of an image using a trained deep learning model.
     '''
 
     # Move model to the appropriate device
-    device = torch.device("cuda" if torch.cuda.is_available() and args.gpu else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() and use_gpu else "cpu")
     print(f"Using {device} for prediction...")
     model.to(device)
     model.eval()
@@ -143,12 +144,12 @@ def predict(image_path, model, topk=5):
     return top_probs, top_classes
 
 
-def display_prediction(image_path, model, cat_to_name):
+def display_prediction(image_path, model, cat_to_name, use_gpu, top_k):
     ''' Display image and predictions from model
     '''
 
-    # Predict the top 5 classes
-    probs, classes = predict(image_path, model)
+    # Predict the top k classes
+    probs, classes = predict(image_path, model, use_gpu, top_k)
     class_names = [cat_to_name[str(cls)] for cls in classes]
 
     # Display the image
@@ -181,10 +182,17 @@ def main():
 
     # Process image
     image = process_image(args.image_path)
-    # imshow(image)
+
+    # Use category_names if provided
+    if args.category_names:
+        with open(args.category_names, 'r') as f:
+            cat_to_name = json.load(f)
+    else:
+        with open('cat_to_name.json', 'r') as f:
+            cat_to_name = json.load(f)
 
     # Prediction and displaying results
-    display_prediction(args.image_path, model, cat_to_name)
+    display_prediction(args.image_path, model, cat_to_name, args.gpu, args.top_k)
 
 
 if __name__ == '__main__':
