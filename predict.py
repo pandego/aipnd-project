@@ -38,10 +38,7 @@ def load_checkpoint(filepath):
     model.load_state_dict(checkpoint['state_dict'])
     model.class_to_idx = checkpoint['class_to_idx']
 
-    # optimizer = None
-    # epochs = checkpoint.get('epochs', 0)
-
-    return model  # , optimizer, epochs
+    return model
 
 
 def process_image(image_path):
@@ -191,11 +188,7 @@ def main():
     args = parser.parse_args()
 
     # Load checkpoint and model
-    # model, optimizer, epochs = load_checkpoint(args.checkpoint)
     model = load_checkpoint(args.checkpoint)
-
-    # Process image
-    image = process_image(args.image_path)
 
     # Use category_names if provided
     if args.category_names:
@@ -205,7 +198,7 @@ def main():
         with open('cat_to_name.json', 'r') as f:
             cat_to_name = json.load(f)
 
-    # Prediction and displaying results
+    # Process image, prediction and displaying results
     display_prediction(args.image_path, model, cat_to_name, args.gpu, args.top_k)
 
 
