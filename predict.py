@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -152,6 +153,10 @@ def display_prediction(image_path, model, cat_to_name, use_gpu, top_k):
     probs, classes = predict(image_path, model, use_gpu, top_k)
     class_names = [cat_to_name[str(cls)] for cls in classes]
 
+    # Console output for the predicted flower name and its probability
+    print(f"Predicted Flower Name: {class_names[0]}")
+    print(f"Probability: {probs[0]:.2f}")
+
     # Display the image
     plt.figure(figsize=(6, 10))
     ax = plt.subplot(2, 1, 1)
@@ -164,6 +169,13 @@ def display_prediction(image_path, model, cat_to_name, use_gpu, top_k):
     plt.xlabel('Probability')
     plt.ylabel('Class')
     plt.gca().invert_yaxis()  # To display the highest probability at the top
+
+    # Save the plot
+    os.makedirs("output", exist_ok=True)
+    output_file = f"output/{image_path.split('/')[-1]}prediction_output.png"
+    plt.savefig(output_file)
+    print(f"Prediction plot saved to '{output_file}'")
+    # plt.show()  # Uncomment if you still want to display the plot
     plt.show()
 
 
@@ -178,7 +190,9 @@ def main():
     args = parser.parse_args()
 
     # Load checkpoint and model
-    model, optimizer, epochs = load_checkpoint(args.checkpoint)
+    # model, optimizer, epochs = load_checkpoint(args.checkpoint)
+    model = load_checkpoint(args.checkpoint)
+
 
     # Process image
     image = process_image(args.image_path)
