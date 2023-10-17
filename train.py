@@ -85,7 +85,7 @@ def main():
     }
 
     # Using the image datasets and the transforms, define the dataloaders
-    batch_size = 8
+    batch_size = 16
     dataloaders = {
         'train': torch.utils.data.DataLoader(image_datasets['train'], batch_size=batch_size, shuffle=True),
         'valid': torch.utils.data.DataLoader(image_datasets['valid'], batch_size=batch_size),
@@ -217,12 +217,21 @@ def main():
     print("Saving model...")
     model.class_to_idx = image_datasets['train'].class_to_idx
 
-    # Saveing the checkpoint
+    # Before the checkpoint dictionary
+    if args.arch in ['vgg16', 'vgg13', 'densenet121', 'alexnet']:
+        classifier_to_save = model.classifier
+    elif args.arch == 'resnet18':
+        classifier_to_save = model.fc
+    else:
+        print(f"Architecture {args.arch} not recognized.")
+        exit()
+
+    # Saving the checkpoint
     checkpoint = {
         'input_size': input_size,
         'output_size': len(cat_to_name),
         'arch': args.arch,
-        'classifier': model.classifier,
+        'classifier': classifier_to_save,
         'state_dict': model.state_dict(),
         'optimizer_state': optimizer.state_dict(),
         'class_to_idx': model.class_to_idx,
@@ -230,8 +239,8 @@ def main():
     }
 
     os.makedirs(args.save_dir, exist_ok=True)
-    torch.save(checkpoint, f"{args.save_dir}/checkpoint.pth")
-    print(f"Model saved: '{args.save_dir}/checkpoint.pth'")
+    torch.save(checkpoint, f"{args.save_dir}/{args.arch}_checkpoint.pth")
+    print(f"Model saved: '{args.save_dir}/{args.arch}_checkpoint.pth'")
 
 
 if __name__ == '__main__':
