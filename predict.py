@@ -155,7 +155,9 @@ def display_prediction(image_path, model, cat_to_name, use_gpu, top_k):
 
     # Console output for the predicted flower name and its probability
     print(f"Predicted Flower Name: {class_names[0]}")
-    print(f"Probability: {probs[0]:.2f}")
+    print(f"Probability: {probs[0]*100:.2f}%")
+    if top_k > 1:
+        print(f"Top {top_k} classes: {class_names}")
 
     # Display the image
     plt.figure(figsize=(6, 10))
