@@ -106,7 +106,7 @@ def imshow(image, ax=None, title=None):
     return ax
 
 
-def predict(image_path, model, use_gpu, topk=5):
+def predict(image_path, model, use_gpu, top_k=5):
     ''' Predict the class (or classes) of an image using a trained deep learning model.
     '''
 
@@ -132,7 +132,7 @@ def predict(image_path, model, use_gpu, topk=5):
     probabilities = torch.exp(output)
 
     # Get the top-k probabilities and indices
-    top_probs, top_indices = probabilities.topk(topk)
+    top_probs, top_indices = probabilities.topk(top_k)
 
     # Convert top_probs and top_indices to lists
     top_probs = top_probs.detach().cpu().numpy().tolist()[0]
@@ -172,11 +172,10 @@ def display_prediction(image_path, model, cat_to_name, use_gpu, top_k):
 
     # Save the plot
     os.makedirs("output", exist_ok=True)
-    output_file = f"output/{image_path.split('/')[-1]}prediction_output.png"
+    output_file = f"output/{image_path.split('/')[-1].split('.')[0]}_prediction_output.png"
     plt.savefig(output_file)
     print(f"Prediction plot saved to '{output_file}'")
     # plt.show()  # Uncomment if you still want to display the plot
-    plt.show()
 
 
 def main():
@@ -192,7 +191,6 @@ def main():
     # Load checkpoint and model
     # model, optimizer, epochs = load_checkpoint(args.checkpoint)
     model = load_checkpoint(args.checkpoint)
-
 
     # Process image
     image = process_image(args.image_path)
